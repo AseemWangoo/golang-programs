@@ -1,0 +1,33 @@
+service: upload-s3
+frameworkVersion: '2'
+
+custom:
+  s3Bucket: test-bucket--aseem
+
+provider:
+  name: aws
+  runtime: go1.x
+  lambdaHashingVersion: 20201221
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - s3:*
+      Resource: "arn:aws:s3:::${self:custom.s3Bucket}/*"
+
+  environment:
+    bucket_name: test-bucket--aseem   
+
+package:
+  patterns:
+    - '!./**'
+    - ./bin/**
+
+functions:
+  upload:
+    handler: bin/upload
+    events:
+      - httpApi:
+          path: /uploadImage
+          method: post
+          cors: true
+    memorySize: 128
